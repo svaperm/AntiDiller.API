@@ -7,7 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { AuthContext } from "./contexts/AuthContext";
 
 import { AuthStack } from "./routes/authStack";
-import { RootStack } from "./routes/rootStack";
+import { RootBottomTabBar } from "./routes/rootBottomTabBar";
 
 type AppState = {
     isLoading: boolean;
@@ -134,12 +134,15 @@ export default function App() {
         <AuthContext.Provider value={authContext}>
             <NavigationContainer>
                 {loginState.userToken !== null ? (
-                    <RootStack />
+                    <RootBottomTabBar />
                 ) :
                 (
                     <AuthStack />
+
                 )}
+
             </NavigationContainer>
         </AuthContext.Provider>
+
     )
 }

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { TextInput, Button } from "react-native-paper";
 import { MaterialIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+import Style from "../../styles/style";
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from "../../routes/authStack";
@@ -24,6 +26,10 @@ export default function SignIn({ route, navigation }: SignInProps) {
 
     const registerButtonHadler = () => {
         navigation.navigate('Register')
+    }
+
+    const signInBtn = (email: string, password: string) => {
+        signIn(email, password);
     }
 
     return (
@@ -52,12 +58,12 @@ export default function SignIn({ route, navigation }: SignInProps) {
             </View>
             <View style={styles.inputView}>
                 <TextInput
-                    label="Password"
+                    label="Пароль"
                     secureTextEntry={true}
                     onChangeText={text => setPassword(text)}
                     returnKeyType="done" />
             </View>
-            <Button style={styles.loginBtn} mode="contained" onPress={() => signIn(email, password)}>Войти</Button>
+            <Button style={styles.loginBtn} mode="contained" onPress={() => signInBtn(email, password)}>Войти</Button>
             <Button style={styles.loginBtn} onPress={registerButtonHadler}>Зарегистрироваться</Button>
         </KeyboardAwareScrollView>
     )

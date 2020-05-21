@@ -4,7 +4,20 @@ import { TextInput, Button } from "react-native-paper";
 import { MaterialIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-export default function Register() {
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from "../../routes/authStack";
+import { RouteProp } from '@react-navigation/native';
+import { AuthContext } from "../../contexts/AuthContext";
+
+type RegisterScreenRouteProp = RouteProp<AuthStackParamList, 'Register'>;
+type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
+
+type RegisterProps = {
+    route: RegisterScreenRouteProp;
+    navigation: RegisterScreenNavigationProp;
+}
+
+export default function Register({ route, navigation }: RegisterProps) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,14 +49,14 @@ export default function Register() {
             </View>
             <View style={styles.inputView}>
                 <TextInput
-                    label="Password"
+                    label="Пароль"
                     secureTextEntry={true}
                     onChangeText={text => setPassword(text)}
                     returnKeyType="done" />
             </View>
             <View style={styles.inputView}>
                 <TextInput
-                    label="Confirm password"
+                    label="Подтвердите пароль"
                     secureTextEntry={true}
                     onChangeText={text => setConfirmPassword(text)}
                     returnKeyType="done" />
