@@ -1,10 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 using AntiDealerApi.Domain.Services;
 using AntiDealerApi.Resources;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AntiDealerApi.Extensions;
 
@@ -45,11 +43,29 @@ namespace AntiDealerApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserInfo()
+        public async Task<IActionResult> GetCurrentUser()
         {
-            var lol = HttpContext.GetUserEmail();
+            var email = HttpContext.GetUserEmail();
+            var user = await _userService.GetCurrentUser(email);
             
-            return new OkObjectResult(lol);
+            return new OkObjectResult(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCurrentUser([FromBody] LoginResource loginResource)
+        {
+            var currentEmail = HttpContext.GetUserEmail();
+            bool error = await _userService.EditCurrentUser(currentEmail, loginResource.Email, loginResource.Password);
+            if (error)
+            {
+                return new BadRequestObjectResult("Пользователь с таким Email уже зарегистрирован.");
+            }
+
+            // re-auth user
+            string email = loginResource.Email != String.Empty ? loginResource.Email : currentEmail;
+            string token = _userService.GenerateJwtToken(email);
+            
+            return new OkObjectResult(token);
         }
     }
 }

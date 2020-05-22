@@ -8,5 +8,6 @@ namespace AntiDealerApi.Domain.Repositories
     {
         Task<User> GetUser(string email);
         Task<User> AddUser(User user);
+        Task SaveChanges();
     }
 }

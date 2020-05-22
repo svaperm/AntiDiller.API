@@ -1,23 +1,13 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
-import { TextInput, Button, HelperText } from "react-native-paper";
-import { MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import { UserContext } from "../../contexts/UserContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { editUserInfo } from "../../api/account";
+import { colors, fonts } from "../../styles/index";
+import { TextInput, HelperText, Button } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthStackParamList } from "../../routes/authStack";
-import { RouteProp } from '@react-navigation/native';
-
 import { useForm } from "react-hook-form";
-import { AuthContext } from '../../contexts/AuthContext';
-
-type RegisterScreenRouteProp = RouteProp<AuthStackParamList, 'Register'>;
-type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
-
-type RegisterProps = {
-    route: RegisterScreenRouteProp;
-    navigation: RegisterScreenNavigationProp;
-}
+import { reducer } from "../../App";
 
 interface FormData {
     email: string;
@@ -25,48 +15,44 @@ interface FormData {
     confirmPassword: string;
 }
 
-export default function Register({ route, navigation }: RegisterProps) {
-    const { signUp } = React.useContext(AuthContext);
+
+function EditAccount() {
+    const { updateToken } = React.useContext(AuthContext);
+    const { userToken } = React.useContext(UserContext);
     const { register, handleSubmit, setValue, errors, watch } = useForm<FormData>();
+    const [password, setPassword] = React.useState('');
 
     React.useEffect(() => {
         register('email', {
-            required: true,
+            //required: true,
             pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                 message: "invalid email address"
             }
         });
         register('password', {
-            required: true,
+            //required: true,
             minLength: 4
         });
         register('confirmPassword', {
-            required: true,
-            validate: (value) => value === watch('password')
+            required: password !== '',
+            validate: (value) => password === '' || value === watch('password', '')
         });
     }, [register])
 
-    const registerBtnHandle = (data: FormData) => {
-        signUp(data.email, data.password);
+    const applyBtnHandle = async (data: FormData) => {
+        await editUserInfo(userToken, data.email, data.password).then(async (newToken) => {
+            Alert.alert('Изменение профиля', 'Данные изменены');
+            await updateToken(newToken);
+        });
     }
 
     return (
         <KeyboardAwareScrollView
-            style={{ backgroundColor: '#b2dfdb' }}
             resetScrollToCoords={{ x: 0, y: 0 }}
             contentContainerStyle={styles.container}
             scrollEnabled={true}
             keyboardShouldPersistTaps="handled" >
-            <View style={styles.topContainer}>
-                <View style={styles.logoContainer}>
-                    <MaterialIcons name="mood-bad" size={125} color="black" />
-                </View>
-                <View style={styles.appNameContainer}>
-                    <Text style={styles.appName}>АнтиДилер</Text>
-                    <Text style={styles.appDesc}>против наркоты</Text>
-                </View>
-            </View>
             <View style={styles.inputView}>
                 <TextInput
                     label="Email"
@@ -79,9 +65,9 @@ export default function Register({ route, navigation }: RegisterProps) {
             </View>
             <View style={styles.inputView}>
                 <TextInput
-                    label="Пароль"
+                    label="Новый пароль"
                     secureTextEntry={true}
-                    onChangeText={text => setValue('password', text, true)}
+                    onChangeText={text => { setValue('password', text, true); setPassword(text); }}
                     returnKeyType="done" />
                 <HelperText type='error' visible={!!errors.password}>Пароль должен содержать 4 или больше символов.</HelperText>
             </View>
@@ -90,24 +76,37 @@ export default function Register({ route, navigation }: RegisterProps) {
                     label="Подтвердите пароль"
                     secureTextEntry={true}
                     onChangeText={text => setValue('confirmPassword', text, true)}
-                    returnKeyType="done" />
+                    returnKeyType="done"
+                    disabled={password === ''} />
                 <HelperText type='error' visible={!!errors.confirmPassword}>Пароли должны совпадать.</HelperText>
             </View>
-            <Button style={styles.loginBtn} mode="contained" onPress={handleSubmit(registerBtnHandle)}>Зарегистрироваться</Button>
-            <Button style={styles.loginBtn} onPress={() => navigation.goBack()}>Отмена</Button>
+            <Button style={styles.loginBtn} mode="contained" onPress={handleSubmit(applyBtnHandle)}>Подтвердить</Button>
         </KeyboardAwareScrollView>
-    )
+    );
 }
+
+export default EditAccount;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#b2dfdb',
+        padding: 15,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+    },
+    title: {
+        fontSize: fonts.lg,
+        marginBottom: 10
+    },
+    subTitle: {
+        fontSize: fonts.md,
+        fontWeight: 'bold'
+    },
+    text: {
+        fontSize: fonts.sm
     },
     inputView: {
-        width: "90%",
+        width: "100%",
         marginBottom: 10,
         justifyContent: "center",
     },

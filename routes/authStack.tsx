@@ -3,7 +3,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SignIn from "../components/auth/SignIn";
 import Register from "../components/auth/Register";
 
-
 export type AuthStackParamList = {
     SignIn: undefined;
     Register: undefined;

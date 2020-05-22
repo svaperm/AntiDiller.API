@@ -1,24 +1,26 @@
 import * as React from 'react';
 import { AsyncStorage } from 'react-native';
-
 import { View } from 'react-native';
+
 import { ActivityIndicator } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
+
 import { AuthContext } from "./contexts/AuthContext";
+import { UserContext } from "./contexts/UserContext";
 
 import { AuthStack } from "./routes/authStack";
 import { RootBottomTabBar } from "./routes/rootBottomTabBar";
 
+import { authenticateUser, registerUser } from "./api/auth";
+
 type AppState = {
     isLoading: boolean;
-    isSignout: boolean;
-    userToken: string | null | undefined;
+    userToken: string;
 }
 
 const initialState: AppState = {
     isLoading: true,
-    isSignout: false,
-    userToken: null,
+    userToken: '',
 }
 
 const RESTORE_TOKEN = 'RESTORE_TOKEN'
@@ -27,12 +29,12 @@ const SIGN_OUT = 'SIGN_OUT'
 
 interface RestoreTokenAction {
     type: typeof RESTORE_TOKEN;
-    token: string | null | undefined;
+    token: string;
 }
 
 interface SignInAction {
     type: typeof SIGN_IN;
-    token: string | null | undefined;
+    token: string;
 }
 
 interface SignOutAction {
@@ -41,9 +43,7 @@ interface SignOutAction {
 
 type AuthActionTypes = RestoreTokenAction | SignInAction | SignOutAction;
 
-// const AuthContext = React.createContext<AppState>(initialState);
-
-function reducer(prevState: AppState, action: AuthActionTypes) {
+export function reducer(prevState: AppState, action: AuthActionTypes) {
     switch (action.type) {
         case RESTORE_TOKEN:
             return {
@@ -54,14 +54,12 @@ function reducer(prevState: AppState, action: AuthActionTypes) {
         case SIGN_IN:
             return {
                 ...prevState,
-                isSignout: false,
                 userToken: action.token,
             };
         case SIGN_OUT:
             return {
                 ...prevState,
-                isSignout: true,
-                userToken: null,
+                userToken: '',
             };
     }
 }
@@ -73,11 +71,16 @@ export default function App() {
     React.useEffect(() => {
         // Fetch the token from storage then navigate to our appropriate place
         const bootstrapAsync = async () => {
-            let userToken;
-            userToken = ''
+            let userToken = '';
+            let res;
             try {
-                userToken = await AsyncStorage.getItem('userToken');
+                res = await AsyncStorage.getItem('userToken');
+                if (res === null)
+                    userToken = ''
+                else
+                    userToken = res
             } catch (e) {
+                userToken = ''
                 // Restoring token failed
             }
 
@@ -91,16 +94,23 @@ export default function App() {
         bootstrapAsync();
     }, []);
 
+
+
     const authContext = React.useMemo(() => ({
         signIn: async (email: string, password: string) => {
-            let userToken;
-            userToken = 'dasdsadsa';
-            try {
-                await AsyncStorage.setItem('userToken', userToken)
-            } catch (e) {
-                console.log(e)
+            let userToken = ''
+            await authenticateUser(email, password).then((token) => {
+                userToken = token;
+            });
+            if (userToken !== '') { // if auth is successful, userToken != ''
+                // save token in storage
+                try {
+                    await AsyncStorage.setItem('userToken', userToken)
+                } catch (e) {
+                    console.log(e)
+                }
+                dispatch({ type: SIGN_IN, token: userToken })
             }
-            dispatch({ type: SIGN_IN, token: userToken })
         },
         signOut: async () => {
             try {
@@ -111,15 +121,28 @@ export default function App() {
             dispatch({ type: SIGN_OUT })
         },
         signUp: async (email: string, password: string) => {
-            let userToken;
-            userToken = 'dasdsadsa';
+            let userToken = '';
+            await registerUser(email, password).then((token) => {
+                userToken = token;
+            });
+            if (userToken !== '') { // if register is successful, userToken != ''
+                // save token in storage
+                try {
+                    await AsyncStorage.setItem('userToken', userToken)
+                } catch (e) {
+                    console.log(e)
+                }
+                dispatch({ type: SIGN_IN, token: userToken })
+            }
+        },
+        updateToken: async (token: string) => {
             try {
-                await AsyncStorage.setItem('userToken', userToken)
+                await AsyncStorage.setItem('userToken', token)
             } catch (e) {
                 console.log(e)
             }
-            dispatch({ type: SIGN_IN, token: userToken })
-        },
+            dispatch({ type: SIGN_IN, token: token })
+        }
     }), [])
 
     if (loginState.isLoading) {
@@ -131,18 +154,19 @@ export default function App() {
     }
 
     return (
-        <AuthContext.Provider value={authContext}>
-            <NavigationContainer>
-                {loginState.userToken !== null ? (
-                    <RootBottomTabBar />
-                ) :
-                (
-                    <AuthStack />
+        <UserContext.Provider value={loginState}>
+            <AuthContext.Provider value={authContext}>
+                <NavigationContainer>
+                    {loginState.userToken !== '' ? (
+                        <RootBottomTabBar />
+                    ) :
+                    (
+                        <AuthStack />
 
-                )}
+                    )}
 
-            </NavigationContainer>
-        </AuthContext.Provider>
-
+                </NavigationContainer>
+            </AuthContext.Provider>
+        </UserContext.Provider>
     )
 }

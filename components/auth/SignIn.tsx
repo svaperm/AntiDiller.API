@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { TextInput, Button } from "react-native-paper";
+import { TextInput, Button, HelperText } from "react-native-paper";
 import { MaterialIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import Style from "../../styles/style";
+import Style from "../../styles";
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from "../../routes/authStack";
 import { RouteProp } from '@react-navigation/native';
 import { AuthContext } from "../../contexts/AuthContext";
+import { useForm } from 'react-hook-form';
 
 type SignInScreenRouteProp = RouteProp<AuthStackParamList, 'SignIn'>;
 type SignInScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'SignIn'>;
@@ -19,17 +20,35 @@ type SignInProps = {
     navigation: SignInScreenNavigationProp;
 }
 
+interface FormData {
+    email: string;
+    password: string;
+}
+
 export default function SignIn({ route, navigation }: SignInProps) {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const { register, handleSubmit, setValue, errors } = useForm<FormData>();
     const { signIn } = React.useContext(AuthContext);
+
+    React.useEffect(() => {
+        register('email', {
+            required: true,
+            pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                message: "invalid email address"
+            }
+        });
+        register('password', {
+            required: true,
+            minLength: 4
+        });
+    }, [register]);
 
     const registerButtonHadler = () => {
         navigation.navigate('Register')
     }
 
-    const signInBtn = (email: string, password: string) => {
-        signIn(email, password);
+    const signInBtn = (data: FormData) => {
+        signIn(data.email, data.password);
     }
 
     return (
@@ -53,17 +72,19 @@ export default function SignIn({ route, navigation }: SignInProps) {
                     autoCompleteType="email"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    onChangeText={text => setEmail(text)}
+                    onChangeText={text => setValue('email', text, true)}
                     returnKeyType="next" />
+                <HelperText type='error' visible={!!errors.email}>Введите корректный Email</HelperText>
             </View>
             <View style={styles.inputView}>
                 <TextInput
                     label="Пароль"
                     secureTextEntry={true}
-                    onChangeText={text => setPassword(text)}
+                    onChangeText={text => setValue('password', text, true)}
                     returnKeyType="done" />
+                <HelperText type='error' visible={!!errors.password}>Пароль должен содержать 4 или больше символов.</HelperText>
             </View>
-            <Button style={styles.loginBtn} mode="contained" onPress={() => signInBtn(email, password)}>Войти</Button>
+            <Button style={styles.loginBtn} mode="contained" onPress={handleSubmit(signInBtn)}>Войти</Button>
             <Button style={styles.loginBtn} onPress={registerButtonHadler}>Зарегистрироваться</Button>
         </KeyboardAwareScrollView>
     )

@@ -5,6 +5,7 @@ namespace AntiDealerApi.Domain.Models
 {
     public class User
     {
+        [JsonIgnore]
         public int Id { get; set; }
         public string Email { get; set; }
         [JsonIgnore]

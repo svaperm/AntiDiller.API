@@ -23,5 +23,10 @@ namespace AntiDealerApi.Domain.Repositories
 
             return user;
         }
+
+        public async Task SaveChanges()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -25,22 +25,22 @@ namespace AntiDealerApi.Services
             _userRepository = userRepository;
         }
 
-        public async Task<string> Authenticate(string username, string password)
+        public async Task<string> Authenticate(string email, string password)
         {
-            var user = await _userRepository.GetUser(username);
-            
+            var user = await _userRepository.GetUser(email);
+
             if (user == null)
                 return null;
-            
+
             string userPasswordHash = user.PasswordHash;
-            
+
             byte[] salt = Convert.FromBase64String(user.Salt);
             string passwordHash = HashPassword(password, salt);
 
             if (!userPasswordHash.Equals(passwordHash)) // check user password
                 return null;
 
-            string token = GenerateJwtToken(user);
+            string token = GenerateJwtToken(user.Email);
             return token;
         }
 
@@ -63,8 +63,41 @@ namespace AntiDealerApi.Services
 
             var user = await _userRepository.AddUser(newUser);
 
-            string token = GenerateJwtToken(user);
+            string token = GenerateJwtToken(user.Email);
             return token;
+        }
+
+        public async Task<User> GetCurrentUser(string email)
+        {
+            var user = await _userRepository.GetUser(email);
+            return user;
+        }
+
+        // returns true if error
+        public async Task<bool> EditCurrentUser(string currentEmail, string email, string password)
+        {
+            // check if email is registered
+            if (email != String.Empty)
+            {
+                var checkUser = await _userRepository.GetUser(email);
+                if (checkUser != null)
+                    return true;
+            }
+
+            var currentUser = await _userRepository.GetUser(currentEmail);
+            if (email != String.Empty)
+                currentUser.Email = email;
+            if (!String.IsNullOrEmpty(password))
+            {
+                byte[] salt = GenerateSalt();
+                string passwordHash = HashPassword(password, salt);
+                
+                currentUser.PasswordHash = passwordHash;
+                currentUser.Salt = Convert.ToBase64String(salt);
+            }
+
+            await _userRepository.SaveChanges();
+            return false;
         }
 
         private string HashPassword(string password, byte[] salt)
@@ -92,7 +125,7 @@ namespace AntiDealerApi.Services
             return salt;
         }
 
-        private string GenerateJwtToken(User user)
+        public string GenerateJwtToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -100,7 +133,7 @@ namespace AntiDealerApi.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, user.Email)
+                    new Claim(ClaimTypes.Email, email)
                 }),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature)
