@@ -1,13 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert } from "react-native";
 import { UserContext } from "../../contexts/UserContext";
 import { AuthContext } from "../../contexts/AuthContext";
 import { editUserInfo } from "../../api/account";
-import { colors, fonts } from "../../styles/index";
+import { fonts } from "../../styles/index";
 import { TextInput, HelperText, Button } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useForm } from "react-hook-form";
-import { reducer } from "../../App";
+import { UserTokens } from "../../api/auth";
 
 interface FormData {
     email: string;
@@ -17,8 +17,8 @@ interface FormData {
 
 
 function EditAccount() {
-    const { updateToken } = React.useContext(AuthContext);
-    const { userToken } = React.useContext(UserContext);
+    const { updateTokens } = React.useContext(AuthContext);
+    const { tokens } = React.useContext(UserContext);
     const { register, handleSubmit, setValue, errors, watch } = useForm<FormData>();
     const [password, setPassword] = React.useState('');
 
@@ -41,9 +41,9 @@ function EditAccount() {
     }, [register])
 
     const applyBtnHandle = async (data: FormData) => {
-        await editUserInfo(userToken, data.email, data.password).then(async (newToken) => {
+        await editUserInfo(tokens as UserTokens, data.email, data.password).then(async (newTokens) => {
             Alert.alert('Изменение профиля', 'Данные изменены');
-            await updateToken(newToken);
+            await updateTokens(newTokens);
         });
     }
 

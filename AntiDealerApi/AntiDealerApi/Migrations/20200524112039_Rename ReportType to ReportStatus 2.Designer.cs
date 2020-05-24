@@ -3,15 +3,17 @@ using System;
 using AntiDealerApi.Domain.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AntiDealerApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200524112039_Rename ReportType to ReportStatus 2")]
+    partial class RenameReportTypetoReportStatus2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +46,7 @@ namespace AntiDealerApi.Migrations
                     b.Property<int?>("ReportStatusId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ReportType")
+                    b.Property<string>("Status")
                         .HasColumnType("text");
 
                     b.Property<int?>("UserId")

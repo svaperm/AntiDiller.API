@@ -8,6 +8,7 @@ using AntiDealerApi.Domain.Models;
 using AntiDealerApi.Domain.Repositories;
 using AntiDealerApi.Domain.Services;
 using AntiDealerApi.Helpers;
+using AntiDealerApi.Resources;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,16 +17,18 @@ namespace AntiDealerApi.Services
 {
     public class UserService : IUserService
     {
-        private readonly AppSettings _appSettings;
         private readonly IUserRepository _userRepository;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly ITokenService _tokenService;
 
-        public UserService(IOptions<AppSettings> appSettings, IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService)
         {
-            _appSettings = appSettings.Value;
             _userRepository = userRepository;
+            _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
         }
 
-        public async Task<string> Authenticate(string email, string password)
+        public async Task<AuthResource> Authenticate(string email, string password)
         {
             var user = await _userRepository.GetUser(email);
 
@@ -35,24 +38,30 @@ namespace AntiDealerApi.Services
             string userPasswordHash = user.PasswordHash;
 
             byte[] salt = Convert.FromBase64String(user.Salt);
-            string passwordHash = HashPassword(password, salt);
+            string passwordHash = _passwordHasher.HashPassword(password, salt);
 
             if (!userPasswordHash.Equals(passwordHash)) // check user password
                 return null;
 
-            string token = GenerateJwtToken(user.Email);
-            return token;
+            string token = _tokenService.GenerateJwtToken(user.Email);
+            string refreshToken = _tokenService.GenerateRefreshToken();
+            await UpdateRefreshToken(email, refreshToken);
+            return new AuthResource
+            {
+                Token = token,
+                RefreshToken = refreshToken
+            };
         }
 
-        public async Task<string> Register(string email, string password)
+        public async Task<AuthResource> Register(string email, string password)
         {
             // check if email is registered
             var checkUser = await _userRepository.GetUser(email);
             if (checkUser != null)
                 return null;
 
-            byte[] salt = GenerateSalt();
-            string passwordHash = HashPassword(password, salt);
+            byte[] salt = _passwordHasher.GenerateSalt();
+            string passwordHash = _passwordHasher.HashPassword(password, salt);
             var newUser = new User
             {
                 Email = email,
@@ -63,11 +72,17 @@ namespace AntiDealerApi.Services
 
             var user = await _userRepository.AddUser(newUser);
 
-            string token = GenerateJwtToken(user.Email);
-            return token;
+            string token = _tokenService.GenerateJwtToken(user.Email);
+            string refreshToken = _tokenService.GenerateRefreshToken();
+            await UpdateRefreshToken(email, refreshToken);
+            return new AuthResource
+            {
+                Token = token,
+                RefreshToken = refreshToken
+            };
         }
 
-        public async Task<User> GetCurrentUser(string email)
+        public async Task<User> GetUser(string email)
         {
             var user = await _userRepository.GetUser(email);
             return user;
@@ -89,9 +104,9 @@ namespace AntiDealerApi.Services
                 currentUser.Email = email;
             if (!String.IsNullOrEmpty(password))
             {
-                byte[] salt = GenerateSalt();
-                string passwordHash = HashPassword(password, salt);
-                
+                byte[] salt = _passwordHasher.GenerateSalt();
+                string passwordHash = _passwordHasher.HashPassword(password, salt);
+
                 currentUser.PasswordHash = passwordHash;
                 currentUser.Salt = Convert.ToBase64String(salt);
             }
@@ -100,49 +115,9 @@ namespace AntiDealerApi.Services
             return false;
         }
 
-        private string HashPassword(string password, byte[] salt)
+        public async Task UpdateRefreshToken(string email, string refreshToken)
         {
-            // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-
-            return hashed;
-        }
-
-        private byte[] GenerateSalt()
-        {
-            // generate a 128-bit salt using a secure PRNG
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-
-            return salt;
-        }
-
-        public string GenerateJwtToken(string email)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Email, email)
-                }),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            string stringToken = tokenHandler.WriteToken(token);
-
-            return stringToken;
+            await _userRepository.UpdateUserRefreshToken(email, refreshToken);
         }
     }
 }

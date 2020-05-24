@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { TextInput, Button, HelperText } from "react-native-paper";
 import { MaterialIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -10,6 +10,8 @@ import { RouteProp } from '@react-navigation/native';
 
 import { useForm } from "react-hook-form";
 import { AuthContext } from '../../contexts/AuthContext';
+
+import { colors } from "../../styles";
 
 type RegisterScreenRouteProp = RouteProp<AuthStackParamList, 'Register'>;
 type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
@@ -53,7 +55,7 @@ export default function Register({ route, navigation }: RegisterProps) {
 
     return (
         <KeyboardAwareScrollView
-            style={{ backgroundColor: '#b2dfdb' }}
+            style={{ backgroundColor: colors.primary }}
             resetScrollToCoords={{ x: 0, y: 0 }}
             contentContainerStyle={styles.container}
             scrollEnabled={true}
@@ -102,7 +104,7 @@ export default function Register({ route, navigation }: RegisterProps) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#b2dfdb',
+        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
     },

@@ -23,6 +23,17 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "ru.antidealer",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyALn8EwVKns6v7A00p2z_UMW_i3O1qXdjk"
+        }
+      }
+    },
+    "extra": {
+      "googleAutoCompleteAPIKey": "AIzaSyCu_wwmPRcktYizg4E5AR8aqlrDs2x4Ktk"
     }
   }
 }

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Tasks;
 using AntiDealerApi.Domain.Persistence.Contexts;
 using AntiDealerApi.Domain.Repositories;
 using AntiDealerApi.Domain.Services;
@@ -33,6 +34,7 @@ namespace AntiDealerApi
                 options.UseNpgsql(Configuration.GetConnectionString("AntiDealerDatabase"));
             });
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -44,19 +46,34 @@ namespace AntiDealerApi
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
-                .AddJwtBearer(x =>
+                .AddJwtBearer(options =>
                 {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IReportService, ReportService>();
 
             services.AddCors();
             services.AddControllers().AddNewtonsoftJson(options =>

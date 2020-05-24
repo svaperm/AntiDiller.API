@@ -3,6 +3,8 @@ import { AsyncStorage } from 'react-native';
 import { View } from 'react-native';
 
 import { ActivityIndicator } from 'react-native-paper';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { AppRegistry } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { AuthContext } from "./contexts/AuthContext";
@@ -11,16 +13,24 @@ import { UserContext } from "./contexts/UserContext";
 import { AuthStack } from "./routes/authStack";
 import { RootBottomTabBar } from "./routes/rootBottomTabBar";
 
-import { authenticateUser, registerUser } from "./api/auth";
+import { authenticateUser, registerUser, UserTokens } from "./api/auth";
+import { MaterialIcons } from '@expo/vector-icons';
+import axios from "axios";
+import { api_host, REFRESH_TOKEN_URL } from "./api/index";
+import { YellowBox } from 'react-native';
+
+YellowBox.ignoreWarnings([
+    'Non-serializable values were found in the navigation state',
+]);
 
 type AppState = {
     isLoading: boolean;
-    userToken: string;
+    tokens: UserTokens | null;
 }
 
 const initialState: AppState = {
     isLoading: true,
-    userToken: '',
+    tokens: null
 }
 
 const RESTORE_TOKEN = 'RESTORE_TOKEN'
@@ -29,12 +39,12 @@ const SIGN_OUT = 'SIGN_OUT'
 
 interface RestoreTokenAction {
     type: typeof RESTORE_TOKEN;
-    token: string;
+    tokens: UserTokens | null;
 }
 
 interface SignInAction {
     type: typeof SIGN_IN;
-    token: string;
+    tokens: UserTokens | null;
 }
 
 interface SignOutAction {
@@ -48,18 +58,18 @@ export function reducer(prevState: AppState, action: AuthActionTypes) {
         case RESTORE_TOKEN:
             return {
                 ...prevState,
-                userToken: action.token,
+                tokens: action.tokens,
                 isLoading: false,
             };
         case SIGN_IN:
             return {
                 ...prevState,
-                userToken: action.token,
+                tokens: action.tokens
             };
         case SIGN_OUT:
             return {
                 ...prevState,
-                userToken: '',
+                tokens: null
             };
     }
 }
@@ -72,15 +82,22 @@ export default function App() {
         // Fetch the token from storage then navigate to our appropriate place
         const bootstrapAsync = async () => {
             let userToken = '';
+            let tokens: UserTokens | null = null;
             let res;
             try {
-                res = await AsyncStorage.getItem('userToken');
+                res = await AsyncStorage.getItem('tokens');
                 if (res === null)
-                    userToken = ''
+                    tokens = null
                 else
-                    userToken = res
+                    tokens = JSON.parse(res);
+
+                // refresh tokens
+                let newTokens = await axios.post<UserTokens>(api_host + REFRESH_TOKEN_URL, tokens)
+                tokens = newTokens.data;
+                await AsyncStorage.setItem('tokens', JSON.stringify(tokens))
+
             } catch (e) {
-                userToken = ''
+                tokens = null;
                 // Restoring token failed
             }
 
@@ -88,7 +105,7 @@ export default function App() {
 
             // This will switch to the App screen or Auth screen and this loading
             // screen will be unmounted and thrown away.
-            dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+            dispatch({ type: 'RESTORE_TOKEN', tokens: tokens });
         };
 
         bootstrapAsync();
@@ -98,50 +115,51 @@ export default function App() {
 
     const authContext = React.useMemo(() => ({
         signIn: async (email: string, password: string) => {
-            let userToken = ''
-            await authenticateUser(email, password).then((token) => {
-                userToken = token;
+            let tokens = null as UserTokens | null;
+            await authenticateUser(email, password).then((authTokens) => {
+                tokens = authTokens;
             });
-            if (userToken !== '') { // if auth is successful, userToken != ''
+            if (tokens?.token) { // if auth is successful, userToken != null
                 // save token in storage
                 try {
-                    await AsyncStorage.setItem('userToken', userToken)
+                    await AsyncStorage.setItem('tokens', JSON.stringify(tokens))
                 } catch (e) {
                     console.log(e)
                 }
-                dispatch({ type: SIGN_IN, token: userToken })
+                dispatch({ type: SIGN_IN, tokens: tokens })
             }
         },
         signOut: async () => {
             try {
-                await AsyncStorage.removeItem('userToken')
+                await AsyncStorage.removeItem('tokens')
             } catch (e) {
                 console.log(e)
             }
             dispatch({ type: SIGN_OUT })
         },
         signUp: async (email: string, password: string) => {
-            let userToken = '';
-            await registerUser(email, password).then((token) => {
-                userToken = token;
+            let tokens = {} as UserTokens;
+            await registerUser(email, password).then((authTokens) => {
+                tokens = authTokens;
             });
-            if (userToken !== '') { // if register is successful, userToken != ''
+            if (tokens !== null) { // if register is successful, userToken != ''
                 // save token in storage
                 try {
-                    await AsyncStorage.setItem('userToken', userToken)
+                    await AsyncStorage.setItem('tokens', JSON.stringify(tokens));
                 } catch (e) {
                     console.log(e)
                 }
-                dispatch({ type: SIGN_IN, token: userToken })
+                dispatch({ type: SIGN_IN, tokens: tokens })
             }
         },
-        updateToken: async (token: string) => {
+        updateTokens: async (tokens: UserTokens) => {
             try {
-                await AsyncStorage.setItem('userToken', token)
+                await AsyncStorage.setItem('tokens', JSON.stringify(tokens));
+
             } catch (e) {
                 console.log(e)
             }
-            dispatch({ type: SIGN_IN, token: token })
+            dispatch({ type: SIGN_IN, tokens: tokens })
         }
     }), [])
 
@@ -154,19 +172,24 @@ export default function App() {
     }
 
     return (
+
         <UserContext.Provider value={loginState}>
             <AuthContext.Provider value={authContext}>
-                <NavigationContainer>
-                    {loginState.userToken !== '' ? (
-                        <RootBottomTabBar />
-                    ) :
-                    (
-                        <AuthStack />
+                <PaperProvider>
+                    <NavigationContainer>
+                        {loginState.tokens !== null ? (
+                            <RootBottomTabBar />
+                        ) :
+                            (
+                                <AuthStack />
 
-                    )}
+                            )}
 
-                </NavigationContainer>
+                    </NavigationContainer>
+                </PaperProvider>
             </AuthContext.Provider>
         </UserContext.Provider>
     )
 }
+
+AppRegistry.registerComponent('App', () => App);

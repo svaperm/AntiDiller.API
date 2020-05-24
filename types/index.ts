@@ -5,13 +5,20 @@ export interface User {
 }
 
 export interface Report {
+    id: number;
     description: string;
-    reportPhoto: ReportPhoto;
+    reportPhoto: string;
     status: string;
     latitude: number;
     longitude: number;
+    reportStatus: ReportStatus;
 }
 
 export interface ReportPhoto {
     photo: string; // base64
+}
+
+export interface ReportStatus {
+    id: number;
+    name: string;
 }

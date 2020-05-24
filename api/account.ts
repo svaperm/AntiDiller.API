@@ -1,30 +1,38 @@
 import axios from "axios";
 import { Alert } from 'react-native';
 import { User } from "../types";
+import { UserTokens } from "./auth";
+import { RequestTypes, GET_REQUEST, POST_REQUEST, fetchWithCredentials } from "./index";
 
-const api_host = 'http://192.168.1.221:5003/api/'
-const GET_USER_INFO_URL = api_host + 'users/'
-const EDIT_USER_INFO_URL = api_host + 'users/'
+const GET_USER_INFO_URL = 'users/'
+const EDIT_USER_INFO_URL = 'users/'
 
-export async function getUserInfo(token: string) {
+export async function getUserInfo(tokens: UserTokens | null) {
     const config = {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${tokens?.token}` }
     };
 
     let res: User = {} as User;
+    tokens = tokens as UserTokens;
 
-    await axios.get<User>(GET_USER_INFO_URL, config).then((response) => {
+    await fetchWithCredentials(GET_USER_INFO_URL, { type: GET_REQUEST }, tokens as UserTokens, {}).then((response) => {
         res = response.data;
     }).catch((error) => {
         Alert.alert("Ошибка", error.response.data);
     });
+    // await axios.get<User>(GET_USER_INFO_URL, config).then((response) => {
+    //     res = response.data;
+    // }).catch((error) => {
+    //     Alert.alert("Ошибка", error.response.data);
+    // });
 
     return res;
 }
 
-export async function editUserInfo(token: string, email: string, password: string) {
+export async function editUserInfo(tokens: UserTokens, email: string, password: string) {
+    // переделать
     const config = {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${tokens?.token}` }
     };
 
     let userToken = '';
@@ -38,5 +46,5 @@ export async function editUserInfo(token: string, email: string, password: strin
         Alert.alert("Ошибка", error.response.data);
     });
 
-    return userToken;
+    return {token: userToken, refreshToken: tokens.refreshToken} as UserTokens;
 }

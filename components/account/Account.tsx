@@ -2,15 +2,20 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { UserContext } from "../../contexts/UserContext";
 import { getUserInfo } from "../../api/account";
+import { getUserReports } from "../../api/report";
 import { colors, fonts } from "../../styles/index";
 import { User, Report } from "../../types";
 import { IconButton, Colors, Button } from "react-native-paper";
 import { AccountStackParamList } from "../../routes/account/accountStack";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { ReportList } from "./ReportList";
+import { Provider as PaperProvider } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 type AccountScreenRouteProp = RouteProp<AccountStackParamList, 'Account'>;
-type AccountScreenNavigationProp = StackNavigationProp<AccountStackParamList, 'Account'>;
+export type AccountScreenNavigationProp = StackNavigationProp<AccountStackParamList, 'Account'>;
 
 type AccountProps = {
     route: AccountScreenRouteProp;
@@ -18,22 +23,26 @@ type AccountProps = {
 }
 
 export function Account({ route, navigation }: AccountProps) {
-    const { userToken } = React.useContext(UserContext);
+    const { tokens } = React.useContext(UserContext);
     const [userData, setUserData] = React.useState({} as User);
+    const [reports, setReports] = React.useState([] as Report[]);
     React.useEffect(() => {
         const getData = async () => {
-            await getUserInfo(userToken).then((data) => {
+            await getUserInfo(tokens).then((data) => {
                 setUserData(data);
+            });
+            await getUserReports(tokens).then((data) => {
+                setReports(data);
             });
         }
 
         getData();
-    }, [userToken]);
+    }, [tokens]);
     return (
         <View style={styles.container}>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.title}>{userData.email}</Text>
-                <Button icon='pencil-outline' onPress={() => navigation.navigate('EditAccount')}>Редактировать</Button>
+                <Button icon='pencil' onPress={() => navigation.navigate('EditAccount')}>Редактировать</Button>
             </View>
             <Text style={styles.subTitle}>{getRatingName(userData.rating)} (рейтинг: {userData.rating})</Text>
             <View
@@ -45,6 +54,7 @@ export function Account({ route, navigation }: AccountProps) {
                 }}
             />
             <Text style={styles.text}>Список заявок</Text>
+            {reports.length ? <ReportList reports={reports} navigation={navigation} />: <Text style={styles.text}>Заявок нет :(</Text>}
         </View>
     );
 }

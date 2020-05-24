@@ -3,15 +3,17 @@ using System;
 using AntiDealerApi.Domain.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AntiDealerApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200524084558_Add RegionName field")]
+    partial class AddRegionNamefield
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,10 +43,7 @@ namespace AntiDealerApi.Migrations
                     b.Property<int?>("ReportPhotoId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ReportStatusId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ReportType")
+                    b.Property<string>("Status")
                         .HasColumnType("text");
 
                     b.Property<int?>("UserId")
@@ -53,8 +52,6 @@ namespace AntiDealerApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ReportPhotoId");
-
-                    b.HasIndex("ReportStatusId");
 
                     b.HasIndex("UserId");
 
@@ -74,38 +71,6 @@ namespace AntiDealerApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ReportPhotos");
-                });
-
-            modelBuilder.Entity("AntiDealerApi.Domain.Models.ReportStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReportStatuses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "В обработке"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Выполнено"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Отказано"
-                        });
                 });
 
             modelBuilder.Entity("AntiDealerApi.Domain.Models.User", b =>
@@ -140,10 +105,6 @@ namespace AntiDealerApi.Migrations
                     b.HasOne("AntiDealerApi.Domain.Models.ReportPhoto", "ReportPhoto")
                         .WithMany()
                         .HasForeignKey("ReportPhotoId");
-
-                    b.HasOne("AntiDealerApi.Domain.Models.ReportStatus", "ReportStatus")
-                        .WithMany()
-                        .HasForeignKey("ReportStatusId");
 
                     b.HasOne("AntiDealerApi.Domain.Models.User", "User")
                         .WithMany("Reports")

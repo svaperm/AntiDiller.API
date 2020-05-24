@@ -1,12 +1,13 @@
 import React from "react";
+import { UserTokens } from "../api/auth";
 
 type AppState = {
-    userToken: string;
+    tokens: UserTokens | null;
     isLoading: boolean;
 }
 
 const initialState: AppState = {
-    userToken: '',
+    tokens: null,
     isLoading: true
 }
 

@@ -4,7 +4,7 @@ import { TextInput, Button, HelperText } from "react-native-paper";
 import { MaterialIcons } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import Style from "../../styles";
+import { colors } from "../../styles";
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParamList } from "../../routes/authStack";
@@ -53,7 +53,7 @@ export default function SignIn({ route, navigation }: SignInProps) {
 
     return (
         <KeyboardAwareScrollView
-            style={{ backgroundColor: '#b2dfdb' }}
+            style={{ backgroundColor: colors.primary }}
             resetScrollToCoords={{ x: 0, y: 0 }}
             contentContainerStyle={styles.container}
             scrollEnabled={true} >
@@ -94,7 +94,7 @@ export default function SignIn({ route, navigation }: SignInProps) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#b2dfdb',
+        backgroundColor: colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
     },

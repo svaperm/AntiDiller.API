@@ -24,6 +24,13 @@ namespace AntiDealerApi.Domain.Repositories
             return user;
         }
 
+        public async Task UpdateUserRefreshToken(string email, string refreshToken)
+        {
+            User user = await _context.Users.SingleOrDefaultAsync(x => x.Email == email);
+            user.RefreshToken = refreshToken;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveChanges()
         {
             await _context.SaveChangesAsync();
