@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MutableRefObject, RefObject } from "react";
 import { View, StyleSheet, Alert, Image, Dimensions, TextInput } from "react-native";
 import { UserContext } from "../../contexts/UserContext";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -31,8 +31,8 @@ export function LocationPicker({ route, navigation }: LocationPickerProps) {
     const [location, setLocation] = React.useState({} as Location.LocationData)
     const [region, setRegion] = React.useState({} as Region)
     const [searchText, setSearchText] = React.useState('')
-    const [markerPosition, setMarkerPosition] = React.useState({} as LatLng)
-
+    const [markerPosition, setMarkerPosition] = React.useState({latitude: 57.882959897925744, longitude: 56.23508658260107} as LatLng)
+    let mapView = React.useRef<MapView>(null);
     const { callback } = route.params
 
     const initialResults: GoogleApiResponse = {
@@ -48,10 +48,18 @@ export function LocationPicker({ route, navigation }: LocationPickerProps) {
                 Alert.alert('Ошибка', 'Для выбора местоположения требуется доступ к GPS')
             }
 
-            await Location.getCurrentPositionAsync();
-            setLocation(location)
+            await Location.getCurrentPositionAsync().then((location) => {
+                setLocation(location);
+                setMarkerPosition(location.coords)
+                mapView.current?.animateToRegion({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.4379651302028009,
+                    longitudeDelta: 0.4750047206878591
+                }, 50);
+            });
         })();
-    });
+    }, []);
 
     const onChangeSearchText = async (text: string) => {
         setSearchText(text);
@@ -86,11 +94,16 @@ export function LocationPicker({ route, navigation }: LocationPickerProps) {
                     longitude: 56.23508658260107,
                     latitudeDelta: 0.4379651302028009,
                     longitudeDelta: 0.4750047206878591
+                }}
+                ref={mapView}
+                onPress={(e) => {
+                    setMarkerPosition(e.nativeEvent.coordinate); 
                 }}>
                 <Marker
-                    coordinate={{ latitude: 57.882959897925744, longitude: 56.23508658260107 }}
+                    coordinate={markerPosition}
                     draggable={true}
-                    onDragEnd={(e) => { setMarkerPosition(e.nativeEvent.coordinate) }} />
+                    onDragEnd={(e) => { setMarkerPosition(e.nativeEvent.coordinate) }}
+                    />
             </MapView>
             {/* <TextInput style={styles.searchInput} placeholder="Введите адрес..." value={searchText} onChangeText={text => onChangeSearchTextDebounced(text)} />
             {!!searchResults.predictions && predictions} */}
