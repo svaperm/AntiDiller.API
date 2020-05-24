@@ -12,6 +12,7 @@ export interface Report {
     latitude: number;
     longitude: number;
     reportStatus: ReportStatus;
+    reportType: string
 }
 
 export interface ReportPhoto {

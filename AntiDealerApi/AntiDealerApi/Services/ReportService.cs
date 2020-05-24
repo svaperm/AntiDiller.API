@@ -24,6 +24,7 @@ namespace AntiDealerApi.Services
             Report report = await _reportRepository.GetReport(id);
             ReportResource reportResource = new ReportResource
             {
+                Id = report.Id,
                 Description = report.Description,
                 ReportStatus = report.ReportStatus.Name,
                 ReportPhoto = Convert.ToBase64String(report.ReportPhoto.Photo),

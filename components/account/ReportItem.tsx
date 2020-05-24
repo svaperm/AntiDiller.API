@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableWithoutFeedback, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Image, ScrollView } from "react-native";
 import { UserContext } from "../../contexts/UserContext";
 import { getReport } from "../../api/report";
 import { colors, fonts } from "../../styles/index";
@@ -30,7 +30,6 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
             await getReport(tokens, id).then((data) => {
                 setReport(data);
                 setImageUri(data.reportPhoto);
-                //imageView.current?.setNativeProps({ source: { uri: data.reportPhoto } })
             })
         }
         getData();
@@ -60,15 +59,12 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
             contentContainerStyle={styles.container}
             scrollEnabled={true}
             keyboardShouldPersistTaps="handled" >
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.reportText}>Категория заявки:</Text>
-            </View>
-            {/* <TextInput multiline={true} style={styles.inputView} label='Описание проблемы' onChangeText={text => setValue('description', text, true)} /> */}
-
-            <Text style={styles.text}>Фотография:</Text>
+            <Text style={styles.title}>Заявка №{report.id}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }}  />
+                {imageUri !== '' && <Image source={{ uri: `data:image/png;base64,${imageUri}` }} style={{ height: 200, width: '100%' }} />}
             </View>
+
+            {/* <TextInput multiline={true} style={styles.inputView} label='Описание проблемы' onChangeText={text => setValue('description', text, true)} /> */}
 
             <Text style={styles.text}>Местоположение (нажмите на карту):</Text>
             <TouchableWithoutFeedback onPress={() => navigation.navigate('LocationViewer', { location: { latitude: latitude, longitude: longitude } })}>
@@ -87,6 +83,14 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
                     <Marker coordinate={{ latitude: latitude, longitude: longitude }}></Marker>
                 </MapView>
             </TouchableWithoutFeedback>
+            <View style={{ flexDirection: 'row' }}>
+                <Text style={styles.reportText}>Категория заявки: {report.reportType}</Text>
+            </View>
+            <Text style={styles.reportText}>Статус рассмотрения заявки: {report.reportStatus}</Text>
+            <Text style={styles.reportText}>Описание:</Text>
+            <ScrollView>
+                <Text>{report.description}</Text>
+            </ScrollView>
         </KeyboardAwareScrollView>
 
     )

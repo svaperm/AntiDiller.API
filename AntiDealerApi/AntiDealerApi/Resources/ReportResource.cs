@@ -2,6 +2,7 @@ namespace AntiDealerApi.Resources
 {
     public class ReportResource
     {
+        public int Id { get; set; }
         public string ReportType { get; set; }
         public string ReportStatus { get; set; }
         public string Description { get; set; }

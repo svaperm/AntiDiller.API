@@ -59,7 +59,9 @@ export async function getReport(tokens: UserTokens | null, id: number) {
     tokens = tokens as UserTokens;
 
     await fetchWithCredentials(GET_REPORT_URL + "?id=" + id, { type: GET_REQUEST }, tokens, {})
-        .then((response) => res = response.data)
+        .then((response) => {
+            res = response.data
+        })
         .catch((error) => {
             Alert.alert("Ошибка", error.response.data);
         });
