@@ -74,6 +74,7 @@ namespace AntiDealerApi
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IStatisticService, StatisticService>();
 
             services.AddCors();
             services.AddControllers().AddNewtonsoftJson(options =>

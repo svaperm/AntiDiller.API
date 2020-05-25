@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntiDealerApi.Domain.Models;
 using AntiDealerApi.Domain.Persistence.Contexts;
+using AntiDealerApi.Resources;
 using Microsoft.EntityFrameworkCore;
 
 namespace AntiDealerApi.Domain.Repositories
@@ -38,6 +39,17 @@ namespace AntiDealerApi.Domain.Repositories
         {
             var status = await _context.ReportStatuses.SingleAsync(x => x.Id == id);
             return status;
+        }
+
+        public async Task<List<StatisticResource>> GetStatistics()
+        {
+            List<StatisticResource> statistics = await _context.Reports.GroupBy(x => x.RegionName).Select(x=> new StatisticResource
+            {
+                RegionName = x.Key,
+                ReportCount = x.Count()
+            }).ToListAsync();
+
+            return statistics;
         }
     }
 }
