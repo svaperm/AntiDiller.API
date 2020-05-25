@@ -11,6 +11,7 @@ import { AuthStackParamList } from "../../routes/authStack";
 import { RouteProp } from '@react-navigation/native';
 import { AuthContext } from "../../contexts/AuthContext";
 import { useForm } from 'react-hook-form';
+import * as Svg from 'react-native-svg';
 
 type SignInScreenRouteProp = RouteProp<AuthStackParamList, 'SignIn'>;
 type SignInScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'SignIn'>;
@@ -63,7 +64,7 @@ export default function SignIn({ route, navigation }: SignInProps) {
                 </View>
                 <View style={styles.appNameContainer}>
                     <Text style={styles.appName}>АнтиДилер</Text>
-                    <Text style={styles.appDesc}>против наркоты</Text>
+                    <Text style={styles.appDesc}>Россия без наркотиков</Text>
                 </View>
             </View>
             <View style={styles.inputView}>
