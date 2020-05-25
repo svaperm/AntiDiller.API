@@ -34,7 +34,8 @@ export function AddReport({ route, navigation }: AddReportProps) {
     const { refreshData } = React.useContext(AuthContext);
     const [menuVisible, setMenuVisible] = React.useState(false);
     const [image, setImage] = React.useState(null as ImageInfo | null)
-    const [location, setLocation] = React.useState({ latitude: 0, longitude: 0 } as LatLng)
+    const [location, setLocation] = React.useState({ latitude: 0, longitude: 0 } as LatLng);
+    const mapView = React.useRef<MapView>({} as MapView);
 
     let reportTypes = ['Реклама', 'Закладка', 'Сайт', 'Человек', 'Место', 'Другое'];
     const [currentReportType, setCurrentReportType] = React.useState(reportTypes[0]);
@@ -95,6 +96,12 @@ export function AddReport({ route, navigation }: AddReportProps) {
     const _setLocation = (location: LatLng) => {
         setLocation(location);
         setValue('location', location, true);
+        mapView.current?.animateToRegion({
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.6379651302028009,
+            longitudeDelta: 0.6750047206878591
+        })
     }
 
     const submitBtnHandle = async (data: FormData) => {
@@ -151,7 +158,8 @@ export function AddReport({ route, navigation }: AddReportProps) {
                     zoomEnabled={false}
                     rotateEnabled={false}
                     scrollEnabled={false}
-                    pitchEnabled={false}>
+                    pitchEnabled={false}
+                    ref={mapView}>
                     {!!location && <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }}></Marker>}
                 </MapView>
             </TouchableWithoutFeedback>
