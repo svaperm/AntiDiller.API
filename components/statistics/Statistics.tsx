@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { fonts, colors } from "../../styles";
-import { List } from "react-native-paper";
+import { List, ActivityIndicator } from "react-native-paper";
 import { AuthContext } from "../../contexts/AuthContext";
 import { UserContext } from "../../contexts/UserContext";
 import { getStatistics, StatisticsItem } from "../../api/statistics";
@@ -9,17 +9,27 @@ import { getStatistics, StatisticsItem } from "../../api/statistics";
 
 export function Statistics() {
     const { tokens } = React.useContext(UserContext);
-    const [statistics, setStatistics] = React.useState([] as StatisticsItem[])
+    const [statistics, setStatistics] = React.useState([] as StatisticsItem[]);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(() => {
         const getData = async () => {
             await getStatistics(tokens).then((data) => {
                 setStatistics(data);
             });
+            setIsLoading(false);
         }
 
         getData();
-    }, [])
+    }, []);
+
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size='large' />
+            </View>
+        )
+    }
 
     const listItems = statistics.map((item, i) => {
         return (

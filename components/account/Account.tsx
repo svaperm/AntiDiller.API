@@ -5,7 +5,7 @@ import { getUserInfo } from "../../api/account";
 import { getUserReports } from "../../api/report";
 import { colors, fonts } from "../../styles/index";
 import { User, Report } from "../../types";
-import { IconButton, Colors, Button } from "react-native-paper";
+import { IconButton, Colors, Button, ActivityIndicator } from "react-native-paper";
 import { AccountStackParamList } from "../../routes/account/accountStack";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -26,6 +26,7 @@ export function Account({ route, navigation }: AccountProps) {
     const { tokens } = React.useContext(UserContext);
     const [userData, setUserData] = React.useState({} as User);
     const [reports, setReports] = React.useState([] as Report[]);
+    const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
         const getData = async () => {
             await getUserInfo(tokens).then((data) => {
@@ -34,10 +35,18 @@ export function Account({ route, navigation }: AccountProps) {
             await getUserReports(tokens).then((data) => {
                 setReports(data);
             });
+            setIsLoading(false);
         }
 
         getData();
     }, [tokens]);
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size='large' />
+            </View>
+        )
+    }
     return (
         <View style={styles.container}>
             <View style={{ flexDirection: 'row' }}>

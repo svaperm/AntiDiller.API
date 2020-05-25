@@ -187,7 +187,6 @@ export default function App() {
     }
 
     return (
-
         <UserContext.Provider value={loginState}>
             <AuthContext.Provider value={authContext}>
                 <PaperProvider>
@@ -195,11 +194,10 @@ export default function App() {
                         {loginState.tokens !== null ? (
                             <RootBottomTabBar />
                         ) :
-                            (
-                                <AuthStack />
+                        (
+                            <AuthStack />
 
-                            )}
-
+                        )}
                     </NavigationContainer>
                 </PaperProvider>
             </AuthContext.Provider>

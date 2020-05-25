@@ -7,7 +7,7 @@ import { User, Report } from "../../types";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { AccountStackParamList } from "../../routes/account/accountStack";
-import { List, TextInput } from 'react-native-paper';
+import { List, TextInput, ActivityIndicator } from 'react-native-paper';
 import MapView, { Marker } from "react-native-maps";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -24,13 +24,15 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
     const { tokens } = React.useContext(UserContext);
     const [report, setReport] = React.useState({} as Report)
     //let imageView = React.createRef<Image>();
-    const [imageUri, setImageUri] = React.useState('')
+    const [imageUri, setImageUri] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
         const getData = async () => {
             await getReport(tokens, id).then((data) => {
                 setReport(data);
                 setImageUri(data.reportPhoto);
-            })
+            });
+            setIsLoading(false);
         }
         getData();
     }, []);
@@ -52,6 +54,14 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
     //         reportIconColor = '919191' // grey
     //         reportIcon = 'help'
     // }
+
+    if (isLoading) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size='large' />
+            </View>
+        )
+    }
 
     return (
         <KeyboardAwareScrollView
