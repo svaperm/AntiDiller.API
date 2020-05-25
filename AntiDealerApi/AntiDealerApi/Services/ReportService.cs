@@ -50,7 +50,8 @@ namespace AntiDealerApi.Services
                 Longitude = report.Longitude,
                 RegionName = await GetLocationRegion(report.Latitude, report.Longitude),
                 User = user,
-                ReportStatus = status
+                ReportStatus = status,
+                ReportType = report.ReportType
             };
 
             await _reportRepository.AddReport(newReport, newReportPhoto);

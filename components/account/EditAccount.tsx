@@ -19,19 +19,22 @@ interface FormData {
 function EditAccount() {
     const { updateTokens } = React.useContext(AuthContext);
     const { tokens } = React.useContext(UserContext);
-    const { register, handleSubmit, setValue, errors, watch } = useForm<FormData>();
+    const { register, handleSubmit, setValue, errors, watch } = useForm<FormData>({
+        defaultValues: {
+            email: '',
+            password: '',
+            confirmPassword: ''
+        }
+    });
     const [password, setPassword] = React.useState('');
 
     React.useEffect(() => {
         register('email', {
-            //required: true,
-            pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                message: "invalid email address"
-            }
+            required: false,
+            validate: (value) => {
+                return value === '' || RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i).test(value)} // if email != '', check it
         });
         register('password', {
-            //required: true,
             minLength: 4
         });
         register('confirmPassword', {

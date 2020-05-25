@@ -8,7 +8,7 @@ import { getStatistics, StatisticsItem } from "../../api/statistics";
 
 
 export function Statistics() {
-    const { tokens } = React.useContext(UserContext);
+    const { tokens, needsUpdate } = React.useContext(UserContext);
     const [statistics, setStatistics] = React.useState([] as StatisticsItem[]);
     const [isLoading, setIsLoading] = React.useState(true);
 
@@ -21,7 +21,7 @@ export function Statistics() {
         }
 
         getData();
-    }, []);
+    }, [needsUpdate]);
 
     if (isLoading) {
         return (

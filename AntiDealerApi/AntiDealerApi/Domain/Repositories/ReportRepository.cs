@@ -49,7 +49,7 @@ namespace AntiDealerApi.Domain.Repositories
                 ReportCount = x.Count()
             }).ToListAsync();
 
-            return statistics;
+            return statistics.OrderByDescending(x=>x.ReportCount).ToList();
         }
     }
 }

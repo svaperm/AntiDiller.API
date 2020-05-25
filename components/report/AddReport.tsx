@@ -39,6 +39,7 @@ export function AddReport({ route, navigation }: AddReportProps) {
 
     let reportTypes = ['Реклама', 'Закладка', 'Сайт', 'Человек', 'Место', 'Другое'];
     const [currentReportType, setCurrentReportType] = React.useState(reportTypes[0]);
+    const [description, setDescription] = React.useState('');
 
     const { register, handleSubmit, setValue, errors, reset } = useForm<FormData>({
         defaultValues: {
@@ -111,6 +112,7 @@ export function AddReport({ route, navigation }: AddReportProps) {
 
     const _resetForm = () => {
         reset();
+        setDescription('');
         setImage(null);
         setLocation({ latitude: 0, longitude: 0 } as LatLng);
     }
@@ -132,7 +134,7 @@ export function AddReport({ route, navigation }: AddReportProps) {
                     {menuItems}
                 </Menu>
             </View>
-            <TextInput multiline={true} style={styles.inputView} label='Описание проблемы' onChangeText={text => setValue('description', text, true)} />
+            <TextInput multiline={true} style={styles.inputView} value={description} label='Описание проблемы' onChangeText={text => {setValue('description', text, true); setDescription(text)}} />
             <HelperText type='error' visible={!!errors.description}>Введите описание проблемы</HelperText>
 
             <Text style={styles.text}>Фотография:</Text>

@@ -67,7 +67,7 @@ namespace AntiDealerApi.Controllers
             }
 
             // re-auth user
-            string email = loginResource.Email != String.Empty ? loginResource.Email : currentEmail;
+            string email =  !String.IsNullOrEmpty(loginResource.Email) ? loginResource.Email : currentEmail;
             string token = _tokenService.GenerateJwtToken(email);
 
             return new OkObjectResult(token);

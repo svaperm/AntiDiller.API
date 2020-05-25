@@ -31,20 +31,34 @@ export async function getUserInfo(tokens: UserTokens | null) {
 
 export async function editUserInfo(tokens: UserTokens, email: string, password: string) {
     // переделать
-    const config = {
-        headers: { Authorization: `Bearer ${tokens?.token}` }
-    };
+    // const config = {
+    //     headers: { Authorization: `Bearer ${tokens?.token}` }
+    // };
 
     let userToken = '';
 
-    await axios.post<string>(GET_USER_INFO_URL, {
-        email: email,
-        password: password
-    }, config).then((response) => {
-        userToken = response.data;
-    }).catch((error) => {
-        Alert.alert("Ошибка", error.response.data);
-    });
+    await fetchWithCredentials(EDIT_USER_INFO_URL,
+        {
+            type: POST_REQUEST,
+            body: {
+                email: email,
+                password: password
+            }
+        }, tokens as UserTokens, {}).then((response) => {
+            userToken = response.data;
+        }).catch((error) => {
+            Alert.alert("Ошибка", error.response.data);
+        });
 
-    return {token: userToken, refreshToken: tokens.refreshToken} as UserTokens;
+
+    // await axios.post<string>(GET_USER_INFO_URL, {
+    //     email: email,
+    //     password: password
+    // }, config).then((response) => {
+    //     userToken = response.data;
+    // }).catch((error) => {
+    //     Alert.alert("Ошибка", error.response.data);
+    // });
+
+    return { token: userToken, refreshToken: tokens.refreshToken } as UserTokens;
 }

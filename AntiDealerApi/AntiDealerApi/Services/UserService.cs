@@ -92,7 +92,7 @@ namespace AntiDealerApi.Services
         public async Task<bool> EditCurrentUser(string currentEmail, string email, string password)
         {
             // check if email is registered
-            if (email != String.Empty)
+            if (!String.IsNullOrEmpty(email))
             {
                 var checkUser = await _userRepository.GetUser(email);
                 if (checkUser != null)
@@ -100,7 +100,7 @@ namespace AntiDealerApi.Services
             }
 
             var currentUser = await _userRepository.GetUser(currentEmail);
-            if (email != String.Empty)
+            if (!String.IsNullOrEmpty(email))
                 currentUser.Email = email;
             if (!String.IsNullOrEmpty(password))
             {

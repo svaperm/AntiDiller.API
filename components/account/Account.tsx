@@ -23,7 +23,7 @@ type AccountProps = {
 }
 
 export function Account({ route, navigation }: AccountProps) {
-    const { tokens } = React.useContext(UserContext);
+    const { tokens, needsUpdate } = React.useContext(UserContext);
     const [userData, setUserData] = React.useState({} as User);
     const [reports, setReports] = React.useState([] as Report[]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -39,7 +39,7 @@ export function Account({ route, navigation }: AccountProps) {
         }
 
         getData();
-    }, [tokens]);
+    }, [tokens, needsUpdate]);
     if (isLoading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
