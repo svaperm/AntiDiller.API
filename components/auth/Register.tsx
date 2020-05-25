@@ -66,7 +66,7 @@ export default function Register({ route, navigation }: RegisterProps) {
                 </View>
                 <View style={styles.appNameContainer}>
                     <Text style={styles.appName}>АнтиДилер</Text>
-                    <Text style={styles.appDesc}>против наркоты</Text>
+                    <Text style={styles.appDesc}>Россия без наркотиков</Text>
                 </View>
             </View>
             <View style={styles.inputView}>

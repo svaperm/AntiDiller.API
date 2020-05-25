@@ -35,9 +35,11 @@ export function ReportList(props: ReportListProps) {
             case 3: // rejected
                 reportIconColor = '#F2453D' // red
                 reportIcon = 'block-helper'
+                break;
             default:
                 reportIconColor = '#919191' // grey
                 reportIcon = 'help'
+                break;
         }
 
         return (
