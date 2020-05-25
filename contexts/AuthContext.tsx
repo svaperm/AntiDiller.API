@@ -6,6 +6,7 @@ type AuthState = {
     signOut: () => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     updateTokens: (tokens: UserTokens) => Promise<void>;
+    refreshData: () => void;
 }
 
 export const AuthContext = React.createContext<AuthState>({} as AuthState);

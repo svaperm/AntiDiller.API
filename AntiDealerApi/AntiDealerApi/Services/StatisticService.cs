@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AntiDealerApi.Domain.Repositories;
+using AntiDealerApi.Domain.Services;
 using AntiDealerApi.Resources;
-using Microsoft.AspNetCore.Mvc;
 
-namespace AntiDealerApi.Domain.Services
+namespace AntiDealerApi.Services
 {
     public class StatisticService : IStatisticService
     {

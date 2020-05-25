@@ -12,6 +12,7 @@ import MapView, { Marker, LatLng } from "react-native-maps";
 import { ImageInfo } from "expo-image-picker/build/ImagePicker.types";
 import { postReport } from "../../api/report";
 import { UserContext } from "../../contexts/UserContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
 type AddReportScreenRouteProp = RouteProp<ReportStackParamList, 'AddReport'>;
 type AddReportScreenNavigationProp = StackNavigationProp<ReportStackParamList, 'AddReport'>;
@@ -30,6 +31,7 @@ interface FormData {
 
 export function AddReport({ route, navigation }: AddReportProps) {
     const { tokens } = React.useContext(UserContext);
+    const { refreshData } = React.useContext(AuthContext);
     const [menuVisible, setMenuVisible] = React.useState(false);
     const [image, setImage] = React.useState(null as ImageInfo | null)
     const [location, setLocation] = React.useState({ latitude: 0, longitude: 0 } as LatLng)
@@ -97,7 +99,7 @@ export function AddReport({ route, navigation }: AddReportProps) {
 
     const submitBtnHandle = async (data: FormData) => {
         await postReport(tokens, data)
-            .then(() => { _resetForm(); })
+            .then(() => { _resetForm(); refreshData(); })
     }
 
     const _resetForm = () => {

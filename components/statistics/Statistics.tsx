@@ -1,11 +1,40 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { fonts, colors } from "../../styles";
+import { List } from "react-native-paper";
+import { AuthContext } from "../../contexts/AuthContext";
+import { UserContext } from "../../contexts/UserContext";
+import { getStatistics, StatisticsItem } from "../../api/statistics";
+
 
 export function Statistics() {
+    const { tokens } = React.useContext(UserContext);
+    const [statistics, setStatistics] = React.useState([] as StatisticsItem[])
+
+    React.useEffect(() => {
+        const getData = async () => {
+            await getStatistics(tokens).then((data) => {
+                setStatistics(data);
+            });
+        }
+
+        getData();
+    }, [])
+
+    const listItems = statistics.map((item, i) => {
+        return (
+            <List.Item key={i}
+                title={`${item.regionName}`}
+                left={props => <Text {...props} style={{paddingTop: 8}}>{i+1}.</Text>}
+                right={props => <Text {...props} style={{paddingTop: 8, color: '#919191'}}>Открытых заявок: {item.reportCount}</Text>}
+            />
+        )
+    })
+
+
     return (
         <View style={styles.container}>
-            <Text>asdasdasd</Text>
+            {statistics.length ? <List.Section style={{ width: '100%' }} title='Статистика по регионам России'>{listItems}</List.Section> : <Text style={styles.text}>Статистика пуста :(</Text>}
         </View>
     );
 }

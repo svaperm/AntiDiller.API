@@ -26,16 +26,19 @@ YellowBox.ignoreWarnings([
 type AppState = {
     isLoading: boolean;
     tokens: UserTokens | null;
+    needsUpdate: boolean;
 }
 
 const initialState: AppState = {
     isLoading: true,
-    tokens: null
+    tokens: null,
+    needsUpdate: false
 }
 
 const RESTORE_TOKEN = 'RESTORE_TOKEN'
 const SIGN_IN = 'SIGN_IN'
 const SIGN_OUT = 'SIGN_OUT'
+const REFRESH = 'REFRESH'
 
 interface RestoreTokenAction {
     type: typeof RESTORE_TOKEN;
@@ -51,7 +54,11 @@ interface SignOutAction {
     type: typeof SIGN_OUT;
 }
 
-type AuthActionTypes = RestoreTokenAction | SignInAction | SignOutAction;
+interface RefreshAction {
+    type: typeof REFRESH;
+}
+
+type AuthActionTypes = RestoreTokenAction | SignInAction | SignOutAction | RefreshAction;
 
 export function reducer(prevState: AppState, action: AuthActionTypes) {
     switch (action.type) {
@@ -71,6 +78,11 @@ export function reducer(prevState: AppState, action: AuthActionTypes) {
                 ...prevState,
                 tokens: null
             };
+        case REFRESH:
+            return {
+                ...prevState,
+                needsUpdate: !(prevState.needsUpdate)
+            }
     }
 }
 
@@ -160,6 +172,9 @@ export default function App() {
                 console.log(e)
             }
             dispatch({ type: SIGN_IN, tokens: tokens })
+        },
+        refreshData: () => {
+            dispatch({ type: REFRESH })
         }
     }), [])
 
