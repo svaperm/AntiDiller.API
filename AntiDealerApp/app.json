@@ -3,9 +3,7 @@
     "name": "AntiDealerApp",
     "slug": "AntiDealerApp",
     "platforms": [
-      "ios",
-      "android",
-      "web"
+      "android"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,19 +19,17 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
       "package": "ru.antidealer",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyALn8EwVKns6v7A00p2z_UMW_i3O1qXdjk"
+          "apiKey": "AIzaSyCu_wwmPRcktYizg4E5AR8aqlrDs2x4Ktk"
         }
-      }
+      },
+      "versionCode": 1
     },
     "extra": {
-      "googleAutoCompleteAPIKey": "AIzaSyCu_wwmPRcktYizg4E5AR8aqlrDs2x4Ktk"
+      "googleAutoCompleteAPIKey": ""
     }
   }
 }

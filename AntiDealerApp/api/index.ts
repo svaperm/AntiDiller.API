@@ -18,7 +18,7 @@ type PostRequestActionType = {
 
 export type RequestTypes = GetRequestActionType | PostRequestActionType;
 
-export const api_host = 'http://192.168.1.237:5003/api/'
+export const api_host = 'http://www.ayylmao.online:26969/api/'
 export const REFRESH_TOKEN_URL = 'users/refreshToken'
 
 export async function fetchWithCredentials(url: string, requestType: RequestTypes, tokens: UserTokens, options: any): Promise<AxiosResponse<any>> {
