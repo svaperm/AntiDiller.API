@@ -28,6 +28,7 @@ export function Account({ route, navigation }: AccountProps) {
     const [reports, setReports] = React.useState([] as Report[]);
     const [isLoading, setIsLoading] = React.useState(true);
     React.useEffect(() => {
+        setIsLoading(true);
         const getData = async () => {
             await getUserInfo(tokens).then((data) => {
                 setUserData(data);

@@ -150,7 +150,7 @@ export default function App() {
             dispatch({ type: SIGN_OUT })
         },
         signUp: async (email: string, password: string) => {
-            let tokens = {} as UserTokens;
+            let tokens = {} as UserTokens | null;
             await registerUser(email, password).then((authTokens) => {
                 tokens = authTokens;
             });

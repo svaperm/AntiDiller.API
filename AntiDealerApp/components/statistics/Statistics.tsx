@@ -13,6 +13,7 @@ export function Statistics() {
     const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(() => {
+        setIsLoading(true);
         const getData = async () => {
             await getStatistics(tokens).then((data) => {
                 setStatistics(data);

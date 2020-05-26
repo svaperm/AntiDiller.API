@@ -3,13 +3,13 @@ import { createStackNavigator, StackNavigationProp } from "@react-navigation/sta
 import Account, { AccountScreenNavigationProp } from "../../components/account/Account";
 import EditAccount from "../../components/account/EditAccount";
 import { AuthContext } from '../../contexts/AuthContext';
-import { Button } from 'react-native-paper';
+import { Button, IconButton } from 'react-native-paper';
 import { colors } from "../../styles";
 import { Report } from "../../types";
 import { LatLng } from 'react-native-maps';
 import { ReportItem } from '../../components/account/ReportItem';
 import { LocationViewer } from '../../components/account/LocationViewer';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 
 export type AccountStackParamList = {
     Account: undefined;
@@ -21,7 +21,7 @@ export type AccountStackParamList = {
 const Stack = createStackNavigator<AccountStackParamList>();
 
 export function AccountStack() {
-    const { signOut } = React.useContext(AuthContext);
+    const { signOut, refreshData } = React.useContext(AuthContext);
 
     const _onSignOutBtnHandle = () => {
         Alert.alert(
@@ -47,7 +47,10 @@ export function AccountStack() {
                 options={{
                     headerTitle: 'Личный кабинет',
                     headerRight: () => (
-                        <Button color="#F2453D" onPress={() => _onSignOutBtnHandle()}>Выход</Button>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <IconButton icon='refresh' onPress={() => refreshData()}/>
+                            <Button color="#F2453D" onPress={() => _onSignOutBtnHandle()}>Выход</Button>
+                        </View>
                     ),
                     headerStyle: { backgroundColor: colors.primary }
                 }}
