@@ -9,6 +9,7 @@ import { Report } from "../../types";
 import { LatLng } from 'react-native-maps';
 import { ReportItem } from '../../components/account/ReportItem';
 import { LocationViewer } from '../../components/account/LocationViewer';
+import { Alert } from 'react-native';
 
 export type AccountStackParamList = {
     Account: undefined;
@@ -22,6 +23,22 @@ const Stack = createStackNavigator<AccountStackParamList>();
 export function AccountStack() {
     const { signOut } = React.useContext(AuthContext);
 
+    const _onSignOutBtnHandle = () => {
+        Alert.alert(
+            'Подтверждение выхода',
+            'Вы действительно хотите выйти?',
+            [
+                {
+                    text: 'Нет',
+                    //onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                },
+                { text: 'Да', onPress: () => signOut() }
+            ],
+            { cancelable: false }
+        );
+    }
+
     return (
         <Stack.Navigator>
             <Stack.Screen
@@ -30,7 +47,7 @@ export function AccountStack() {
                 options={{
                     headerTitle: 'Личный кабинет',
                     headerRight: () => (
-                        <Button color="#F2453D" onPress={() => signOut()}>Выход</Button>
+                        <Button color="#F2453D" onPress={() => _onSignOutBtnHandle()}>Выход</Button>
                     ),
                     headerStyle: { backgroundColor: colors.primary }
                 }}
