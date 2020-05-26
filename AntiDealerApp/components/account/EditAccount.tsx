@@ -32,7 +32,8 @@ function EditAccount() {
         register('email', {
             required: false,
             validate: (value) => {
-                return value === '' || RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i).test(value)} // if email != '', check it
+                return value === '' || RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i).test(value)
+            } // if email != '', check it
         });
         register('password', {
             minLength: 4
@@ -45,8 +46,10 @@ function EditAccount() {
 
     const applyBtnHandle = async (data: FormData) => {
         await editUserInfo(tokens as UserTokens, data.email, data.password).then(async (newTokens) => {
-            Alert.alert('Изменение профиля', 'Данные изменены');
-            await updateTokens(newTokens);
+            if (newTokens !== null) {
+                Alert.alert('Изменение профиля', 'Данные изменены');
+                await updateTokens(newTokens);
+            }
         });
     }
 

@@ -27,17 +27,17 @@ export async function authenticateUser(email: string, password: string) {
 }
 
 export async function registerUser(email: string, password: string) {
-    let userToken: UserTokens | null = {} as UserTokens;
+    //let userToken: UserTokens | null = {} as UserTokens;
+    let userTokens: UserTokens | null = null;
 
     await axios.post<UserTokens>(REGISTER_URL, {
         email: email,
         password: password
     }).then((response) => {
-        userToken = response.data;
+        userTokens = response.data;
     }).catch((error) => {
         Alert.alert("Ошибка", error.response.data);
-        return null;
     });
 
-    return userToken;
+    return userTokens as UserTokens | null;
 }

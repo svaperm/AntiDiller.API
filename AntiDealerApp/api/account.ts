@@ -34,8 +34,9 @@ export async function editUserInfo(tokens: UserTokens, email: string, password: 
     // const config = {
     //     headers: { Authorization: `Bearer ${tokens?.token}` }
     // };
+    let userTokens: UserTokens | null = null;
 
-    let userToken = '';
+    //let userToken = tokens.token;
 
     await fetchWithCredentials(EDIT_USER_INFO_URL,
         {
@@ -45,7 +46,11 @@ export async function editUserInfo(tokens: UserTokens, email: string, password: 
                 password: password
             }
         }, tokens as UserTokens, {}).then((response) => {
-            userToken = response.data;
+            userTokens = {
+                token: response.data,
+                refreshToken: tokens.refreshToken
+            }
+            //userToken = response.data;
         }).catch((error) => {
             Alert.alert("Ошибка", error.response.data);
         });
@@ -60,5 +65,6 @@ export async function editUserInfo(tokens: UserTokens, email: string, password: 
     //     Alert.alert("Ошибка", error.response.data);
     // });
 
-    return { token: userToken, refreshToken: tokens.refreshToken } as UserTokens;
+    //return { token: userToken, refreshToken: tokens.refreshToken } as UserTokens;
+    return userTokens as UserTokens | null;
 }
