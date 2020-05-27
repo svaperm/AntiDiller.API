@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#b2dfdb"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -30,6 +30,10 @@
     },
     "extra": {
       "googleAutoCompleteAPIKey": ""
+    },
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "sourceExts": ["js", "jsx", "svg", "ts", "tsx"]
     }
   }
 }

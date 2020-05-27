@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from '../../contexts/AuthContext';
 
 import { colors } from "../../styles";
+import AppLogo from "../../assets/logo.svg";
 
 type RegisterScreenRouteProp = RouteProp<AuthStackParamList, 'Register'>;
 type RegisterScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Register'>;
@@ -62,7 +63,7 @@ export default function Register({ route, navigation }: RegisterProps) {
             keyboardShouldPersistTaps="handled" >
             <View style={styles.topContainer}>
                 <View style={styles.logoContainer}>
-                    <MaterialIcons name="mood-bad" size={125} color="black" />
+                    <AppLogo width={125} height={120} />
                 </View>
                 <View style={styles.appNameContainer}>
                     <Text style={styles.appName}>АнтиДилер</Text>

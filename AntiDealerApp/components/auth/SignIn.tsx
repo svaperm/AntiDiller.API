@@ -12,6 +12,7 @@ import { RouteProp } from '@react-navigation/native';
 import { AuthContext } from "../../contexts/AuthContext";
 import { useForm } from 'react-hook-form';
 import * as Svg from 'react-native-svg';
+import AppLogo from "../../assets/logo.svg";
 
 type SignInScreenRouteProp = RouteProp<AuthStackParamList, 'SignIn'>;
 type SignInScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'SignIn'>;
@@ -60,7 +61,7 @@ export default function SignIn({ route, navigation }: SignInProps) {
             scrollEnabled={true} >
             <View style={styles.topContainer}>
                 <View style={styles.logoContainer}>
-                    <MaterialIcons name="mood-bad" size={125} color="black" />
+                    <AppLogo width={125} height={120} />
                 </View>
                 <View style={styles.appNameContainer}>
                     <Text style={styles.appName}>АнтиДилер</Text>
