@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableWithoutFeedback, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Image, ScrollView, TouchableOpacity, Modal } from "react-native";
 import { UserContext } from "../../contexts/UserContext";
 import { getReport } from "../../api/report";
 import { colors, fonts } from "../../styles/index";
@@ -10,6 +10,8 @@ import { AccountStackParamList } from "../../routes/account/accountStack";
 import { List, TextInput, ActivityIndicator } from 'react-native-paper';
 import MapView, { Marker } from "react-native-maps";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ImageView from "react-native-image-viewing";
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 type ReportItemScreenRouteProp = RouteProp<AccountStackParamList, 'ReportItem'>;
 type ReportItemScreenNavigationProp = StackNavigationProp<AccountStackParamList, 'ReportItem'>;
@@ -26,6 +28,8 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
     //let imageView = React.createRef<Image>();
     const [imageUri, setImageUri] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(true);
+    const [imageViewVisible, setImageViewVisible] = React.useState(false);
+
     React.useEffect(() => {
         const getData = async () => {
             await getReport(tokens, id).then((data) => {
@@ -71,8 +75,21 @@ export function ReportItem({ route, navigation }: ReportItemProps) {
             keyboardShouldPersistTaps="handled" >
             <Text style={styles.title}>Заявка №{report.id}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {imageUri !== '' && <Image source={{ uri: `data:image/png;base64,${imageUri}` }} style={{ height: 200, width: '100%' }} />}
+                {imageUri !== '' &&
+                    <TouchableWithoutFeedback onPress={() => setImageViewVisible(true)}>
+                        <Image source={{ uri: `data:image/png;base64,${imageUri}` }} style={{ height: 200, width: '100%' }} />
+                    </TouchableWithoutFeedback>
+                }
             </View>
+            <Modal
+                visible={imageViewVisible}
+                transparent={true}
+                onRequestClose={() => setImageViewVisible(false)}>
+                <ImageViewer
+                    imageUrls={[{ url: `data:image/png;base64,${imageUri}` }]}
+                    enableSwipeDown={true}
+                    onSwipeDown={() => setImageViewVisible(false)} />
+            </Modal>
 
             {/* <TextInput multiline={true} style={styles.inputView} label='Описание проблемы' onChangeText={text => setValue('description', text, true)} /> */}
 
