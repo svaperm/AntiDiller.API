@@ -10,7 +10,6 @@ import { AccountStackParamList } from "../../routes/account/accountStack";
 import { List, TextInput, ActivityIndicator } from 'react-native-paper';
 import MapView, { Marker } from "react-native-maps";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import ImageView from "react-native-image-viewing";
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 type ReportItemScreenRouteProp = RouteProp<AccountStackParamList, 'ReportItem'>;
