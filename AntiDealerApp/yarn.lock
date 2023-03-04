@@ -4129,9 +4129,9 @@ minimatch@^3.0.4:
     brace-expansion "^1.1.7"
 
 minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
+  integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
 
 mixin-deep@^1.2.0:
   version "1.3.2"
@@ -4833,11 +4833,6 @@ react-native-image-pan-zoom@^2.1.12:
   version "2.1.12"
   resolved "https://registry.yarnpkg.com/react-native-image-pan-zoom/-/react-native-image-pan-zoom-2.1.12.tgz#eb98bf56fb5610379bdbfdb63219cc1baca98fd2"
   integrity sha512-BF66XeP6dzuANsPmmFsJshM2Jyh/Mo1t8FsGc1L9Q9/sVP8MJULDabB1hms+eAoqgtyhMr5BuXV3E1hJ5U5H6Q==
-
-react-native-image-viewing@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-image-viewing/-/react-native-image-viewing-0.2.0.tgz#3c0bc67cfb9aa7607cec632139d7ef4c45e07e4e"
-  integrity sha512-j2JXv86WRXGNme4LPsNCJ/2MgX+oVbmJ5ZLbGrYbKXcCPe9OshqlQI5L3SdbAxWu/F5pubcMaXp0zoYNaZVuzA==
 
 react-native-image-zoom-viewer@^3.0.1:
   version "3.0.1"
